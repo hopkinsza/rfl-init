@@ -30,6 +30,7 @@ fi
 warn 'starting udev'
 if ps axo comm | grep udevd >/dev/null; then
 	# already running
+	:
 else
 	udevd --daemon
 	udevadm trigger --action=add --type=subsystems
