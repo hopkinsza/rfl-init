@@ -1,0 +1,29 @@
+#!/bin/ksh
+#
+# fsck and mount local filesystems,
+# possibly including /var and other essentials.
+#
+# Any steps needed beforehand go in /etc/rc.discoverfs:
+# - activating software RAID
+# - lvm
+# - zfs/btrfs
+#
+
+# TODO: swap could be using a file mounted on a local or remote fs
+msg 'activating swap'
+swapon -a || warn 'swapon failed'
+
+if [[ -e RF_ETCBASE/rc.discoverfs ]]; then
+	. RF_ETCBASE/rc.discoverfs
+fi
+
+msg 'mounting local filesystems'
+
+# fsck everything (excluding /) with fs_passno>0 in /etc/fstab
+msg2 'fsck'
+fsck -RAT -p
+
+msg2 'mount'
+for i in $critfs_local; do
+	mountpoint -q "$i" || mount "$i"
+done

@@ -1,0 +1,4 @@
+#!/bin/ksh
+
+msg 'running RF_ETCBASE/netstart'
+RF_ETCBASE/netstart

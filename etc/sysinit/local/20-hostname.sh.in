@@ -1,0 +1,10 @@
+#!/bin/ksh
+
+msg 'setting hostname'
+if [[ -n $hostname ]]; then
+	hostname $hostname
+elif [[ -r RF_ETCBASE/hostname ]]; then
+	hostname "$(stripcom RF_ETCBASE/hostname)"
+else
+	warn 'no hostname set'
+fi

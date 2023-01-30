@@ -1,0 +1,55 @@
+#!/bin/ksh
+
+. RF_EXECBASE/lib/rift/functions
+. RF_ETCBASE/rc.conf
+
+PATH=/usr/local/bin:/usr/local/sbin:/bin:/sbin:/usr/bin:/usr/sbin
+
+# one time sysinit tasks
+if [[ ! -e /run/rc.sysinit-done ]]; then
+	warn 'running sysinit tasks'
+
+	for f in RF_ETCBASE/sysinit/*/*.sh; do
+		. $f
+	done
+	touch /run/rc.sysinit-done
+fi
+
+###
+### rc.local
+###
+
+if [[ -e RF_ETCBASE/rc.local ]]; then
+	. RF_ETCBASE/rc.local
+fi
+
+###
+### services
+###
+
+warn 'starting udev'
+if ps axo comm | grep udevd >/dev/null; then
+	# already running
+else
+	udevd --daemon
+	udevadm trigger --action=add --type=subsystems
+	udevadm trigger --action=add --type=devices
+	udevadm settle --timeout=8
+fi
+
+# XXX: may want to populate /run with more dirs like lvm, lock, log
+
+###
+### login
+###
+
+cat <<EOF
+
++---------+
+| /etc/rc |
++---------+
+
+EOF
+
+# now run your "essential" process, perhaps gettyd
+ksh

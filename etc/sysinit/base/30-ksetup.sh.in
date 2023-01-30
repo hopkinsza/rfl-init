@@ -1,0 +1,30 @@
+#!/bin/ksh
+#
+# Get the kernel configured / initialized:
+# - load specifically configured modules
+# - set sysctl variables
+#
+# udev is started by /etc/rc.
+#
+
+#
+# kmods
+#
+
+msg 'loading kernel modules'
+
+stripcom RF_ETCBASE/modules.conf | while read i; do
+	modprobe -b $i
+done
+
+# modules that must be loaded before starting udev
+for i in $(kmod static-nodes 2>/dev/null | awk '/Module/ {print $2}'); do
+	modprobe -bq $i 2>/dev/null
+done
+
+#
+# sysctl
+#
+
+msg 'setting sysctl variables'
+sysctl -f RF_ETCBASE/sysctl.conf

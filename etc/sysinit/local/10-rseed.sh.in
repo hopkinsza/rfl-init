@@ -1,0 +1,4 @@
+#!/bin/ksh
+
+msg 'loading random seed'
+rseed load
